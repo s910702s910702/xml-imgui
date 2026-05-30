@@ -83,10 +83,14 @@ endif()
 
 if(XML_IMGUI_BUILD_TESTS)
   enable_testing()
-  add_executable(xml_imgui_tests
-    tests/cli_tests.cpp
-    tests/parser_tests.cpp
-  )
-  target_link_libraries(xml_imgui_tests PRIVATE xml_imgui::xml_imgui)
-  add_test(NAME xml_imgui_tests COMMAND xml_imgui_tests)
+
+  function(xml_imgui_add_unit_test target source)
+    add_executable(${target} ${source})
+    target_link_libraries(${target} PRIVATE xml_imgui::xml_imgui)
+    add_test(NAME ${target} COMMAND ${target})
+  endfunction()
+
+  xml_imgui_add_unit_test(xml_imgui_cli_tests tests/cli_tests.cpp)
+  xml_imgui_add_unit_test(xml_imgui_parser_tests tests/parser_tests.cpp)
+  xml_imgui_add_unit_test(xml_imgui_version_tests tests/version_tests.cpp)
 endif()

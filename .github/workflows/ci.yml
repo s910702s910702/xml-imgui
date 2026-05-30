@@ -54,5 +54,5 @@ jobs:
       - name: Build
         run: cmake --build --preset debug
 
-      - name: Test
-        run: ctest --preset debug
+      - name: Run unit tests
+        run: ctest --preset debug --output-on-failure

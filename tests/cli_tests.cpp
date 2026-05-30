@@ -1,5 +1,4 @@
 #include "xml_imgui/cli.hpp"
-#include "xml_imgui/version.hpp"
 
 #include <iostream>
 #include <string_view>
@@ -16,7 +15,7 @@ int expect(bool condition, std::string_view message) {
 
 }  // namespace
 
-int run_cli_tests() {
+int main() {
   int failures = 0;
 
   {
@@ -52,8 +51,6 @@ int run_cli_tests() {
   failures += expect(!usage.empty(), "usage text should not be empty");
   failures += expect(usage.find("--help") != std::string_view::npos, "usage should include help flag");
   failures += expect(usage.find("--version") != std::string_view::npos, "usage should include version flag");
-  failures += expect(std::string_view(xml_imgui::version()).find('.') != std::string_view::npos,
-                     "version should contain separators");
 
   return failures;
 }
