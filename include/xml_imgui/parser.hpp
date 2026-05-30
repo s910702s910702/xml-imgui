@@ -11,10 +11,17 @@ struct Attribute {
   std::string value;
 };
 
+struct SourceLocation {
+  int line = 0;
+  int column = 0;
+};
+
 struct Node {
   std::string tag;
   std::vector<Attribute> attributes;
   std::vector<Node> children;
+  std::string text;
+  SourceLocation location;
 };
 
 struct ParseResult {

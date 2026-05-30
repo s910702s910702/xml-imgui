@@ -10,6 +10,8 @@ project(
 option(XML_IMGUI_BUILD_TESTS "Build xml_imgui tests" ON)
 option(XML_IMGUI_BUILD_EXAMPLES "Build xml_imgui examples" ON)
 
+find_package(LibXml2 REQUIRED)
+
 add_library(xml_imgui
   src/parser.cpp
   src/version.cpp
@@ -24,6 +26,8 @@ target_include_directories(xml_imgui
 )
 
 target_compile_features(xml_imgui PUBLIC cxx_std_20)
+
+target_link_libraries(xml_imgui PUBLIC LibXml2::LibXml2)
 
 if(MSVC)
   target_compile_options(xml_imgui PRIVATE /W4 /permissive-)
