@@ -22,12 +22,21 @@ Requirements:
 - CMake 3.20+
 - Ninja
 - A C++20 compiler
+- libxml2
 
 ```sh
 cmake --preset debug
 cmake --build --preset debug
 ctest --preset debug
 ```
+
+On macOS, dependencies can be installed with:
+
+```sh
+brew bundle
+```
+
+See `docs/DEPENDENCIES.md` for dependency management notes.
 
 ## Try the CLI
 
@@ -43,12 +52,11 @@ root: Window
 
 ## Project Direction
 
-The parser is intentionally tiny for now. The next milestones are:
+The XML parser frontend uses `libxml2`; project-specific work begins after XML is converted into an internal tree. The next milestones are:
 
 1. Define the XML schema for ImGui concepts.
-2. Parse attributes and child nodes.
-3. Add validation and useful diagnostics.
-4. Map XML nodes to an intermediate UI object tree.
-5. Generate or drive Dear ImGui rendering code from that tree.
+2. Add validation and useful diagnostics.
+3. Map XML nodes to an intermediate UI object tree.
+4. Generate or drive Dear ImGui rendering code from that tree.
 
 See `docs/PRD.md` for the first planning draft.

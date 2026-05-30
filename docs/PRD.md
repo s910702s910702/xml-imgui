@@ -53,7 +53,7 @@ This project separates UI description from runtime rendering logic:
 
 ```mermaid
 flowchart LR
-  XML["XML source"] --> Parser["XML parser"]
+  XML["XML source"] --> Parser["libxml2 XML parser"]
   Parser --> AST["Raw XML AST"]
   AST --> Validator["Schema validator"]
   Validator --> UIModel["Typed UI object tree"]
@@ -80,9 +80,10 @@ flowchart LR
 
 ### M1: Minimal Parser
 
-- Parse tags, attributes, text, children, and self-closing elements.
-- Preserve line and column information.
-- Add focused parser tests.
+- Integrate `libxml2` as the XML parser frontend.
+- Convert `libxml2` nodes into the internal XML tree.
+- Preserve source location information where available.
+- Add focused parser conversion tests.
 
 ### M2: Schema Validation
 
