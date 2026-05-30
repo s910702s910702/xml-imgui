@@ -11,6 +11,44 @@ option(XML_IMGUI_BUILD_TESTS "Build xml_imgui tests" ON)
 option(XML_IMGUI_BUILD_EXAMPLES "Build xml_imgui examples" ON)
 
 find_package(LibXml2 REQUIRED)
+find_package(Git QUIET)
+
+set(XML_IMGUI_VERSION_BASE "${PROJECT_VERSION}")
+set(XML_IMGUI_COMMIT_COUNT "0")
+
+if(Git_FOUND)
+  execute_process(
+    COMMAND "${GIT_EXECUTABLE}" describe --tags --abbrev=0
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+    OUTPUT_VARIABLE XML_IMGUI_GIT_TAG
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
+  execute_process(
+    COMMAND "${GIT_EXECUTABLE}" rev-list --count HEAD
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+    OUTPUT_VARIABLE XML_IMGUI_GIT_COMMIT_COUNT
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
+  if(XML_IMGUI_GIT_TAG)
+    string(REGEX REPLACE "^v" "" XML_IMGUI_VERSION_BASE "${XML_IMGUI_GIT_TAG}")
+  endif()
+
+  if(XML_IMGUI_GIT_COMMIT_COUNT)
+    set(XML_IMGUI_COMMIT_COUNT "${XML_IMGUI_GIT_COMMIT_COUNT}")
+  endif()
+endif()
+
+set(XML_IMGUI_VERSION_STRING "${XML_IMGUI_VERSION_BASE}.${XML_IMGUI_COMMIT_COUNT}")
+
+configure_file(
+  cmake/version_config.hpp.in
+  "${PROJECT_BINARY_DIR}/generated/xml_imgui/version_config.hpp"
+  @ONLY
+)
 
 add_library(xml_imgui
   src/parser.cpp
@@ -22,6 +60,7 @@ add_library(xml_imgui::xml_imgui ALIAS xml_imgui)
 target_include_directories(xml_imgui
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated>
     $<INSTALL_INTERFACE:include>
 )
 
