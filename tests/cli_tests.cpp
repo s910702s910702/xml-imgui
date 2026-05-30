@@ -1,56 +1,67 @@
 #include "xml_imgui/cli.hpp"
 
-#include <iostream>
+#include <gtest/gtest.h>
+
 #include <string_view>
 
-namespace {
+TEST(CliTests, UsesStdinParsingByDefault) {
+  const char* argv[] = {"xml_imgui_cli"};
 
-int expect(bool condition, std::string_view message) {
-  if (!condition) {
-    std::cerr << "FAIL: " << message << '\n';
-    return 1;
-  }
-  return 0;
+  const auto options = xml_imgui::parse_cli(1, argv);
+
+  EXPECT_TRUE(options.ok);
+  EXPECT_EQ(options.action, xml_imgui::CliAction::ParseStdin);
 }
 
-}  // namespace
+TEST(CliTests, ParsesHelpFlag) {
+  const char* argv[] = {"xml_imgui_cli", "--help"};
 
-int main() {
-  int failures = 0;
+  const auto options = xml_imgui::parse_cli(2, argv);
 
-  {
-    const char* argv[] = {"xml_imgui_cli"};
-    const auto options = xml_imgui::parse_cli(1, argv);
-    failures += expect(options.ok, "empty cli options should parse");
-    failures +=
-        expect(options.action == xml_imgui::CliAction::ParseStdin, "default action should parse stdin");
-  }
+  EXPECT_TRUE(options.ok);
+  EXPECT_EQ(options.action, xml_imgui::CliAction::ShowHelp);
+}
 
-  {
-    const char* argv[] = {"xml_imgui_cli", "--help"};
-    const auto options = xml_imgui::parse_cli(2, argv);
-    failures += expect(options.ok, "help option should parse");
-    failures += expect(options.action == xml_imgui::CliAction::ShowHelp, "help action should be selected");
-  }
+TEST(CliTests, ParsesShortHelpFlag) {
+  const char* argv[] = {"xml_imgui_cli", "-h"};
 
-  {
-    const char* argv[] = {"xml_imgui_cli", "--version"};
-    const auto options = xml_imgui::parse_cli(2, argv);
-    failures += expect(options.ok, "version option should parse");
-    failures +=
-        expect(options.action == xml_imgui::CliAction::ShowVersion, "version action should be selected");
-  }
+  const auto options = xml_imgui::parse_cli(2, argv);
 
-  {
-    const char* argv[] = {"xml_imgui_cli", "--wat"};
-    const auto options = xml_imgui::parse_cli(2, argv);
-    failures += expect(!options.ok, "unknown option should fail");
-  }
+  EXPECT_TRUE(options.ok);
+  EXPECT_EQ(options.action, xml_imgui::CliAction::ShowHelp);
+}
 
+TEST(CliTests, ParsesVersionFlag) {
+  const char* argv[] = {"xml_imgui_cli", "--version"};
+
+  const auto options = xml_imgui::parse_cli(2, argv);
+
+  EXPECT_TRUE(options.ok);
+  EXPECT_EQ(options.action, xml_imgui::CliAction::ShowVersion);
+}
+
+TEST(CliTests, ParsesShortVersionFlag) {
+  const char* argv[] = {"xml_imgui_cli", "-v"};
+
+  const auto options = xml_imgui::parse_cli(2, argv);
+
+  EXPECT_TRUE(options.ok);
+  EXPECT_EQ(options.action, xml_imgui::CliAction::ShowVersion);
+}
+
+TEST(CliTests, RejectsUnknownOptions) {
+  const char* argv[] = {"xml_imgui_cli", "--wat"};
+
+  const auto options = xml_imgui::parse_cli(2, argv);
+
+  EXPECT_FALSE(options.ok);
+  EXPECT_FALSE(options.error.empty());
+}
+
+TEST(CliTests, ProvidesUsageText) {
   const auto usage = xml_imgui::cli_usage();
-  failures += expect(!usage.empty(), "usage text should not be empty");
-  failures += expect(usage.find("--help") != std::string_view::npos, "usage should include help flag");
-  failures += expect(usage.find("--version") != std::string_view::npos, "usage should include version flag");
 
-  return failures;
+  EXPECT_FALSE(usage.empty());
+  EXPECT_NE(usage.find("--help"), std::string_view::npos);
+  EXPECT_NE(usage.find("--version"), std::string_view::npos);
 }

@@ -83,11 +83,13 @@ endif()
 
 if(XML_IMGUI_BUILD_TESTS)
   enable_testing()
+  include(GoogleTest)
+  find_package(GTest REQUIRED)
 
   function(xml_imgui_add_unit_test target source)
     add_executable(${target} ${source})
-    target_link_libraries(${target} PRIVATE xml_imgui::xml_imgui)
-    add_test(NAME ${target} COMMAND ${target})
+    target_link_libraries(${target} PRIVATE GTest::gtest_main xml_imgui::xml_imgui)
+    gtest_discover_tests(${target})
   endfunction()
 
   xml_imgui_add_unit_test(xml_imgui_cli_tests tests/cli_tests.cpp)

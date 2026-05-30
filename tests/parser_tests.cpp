@@ -1,43 +1,36 @@
 #include "xml_imgui/parser.hpp"
 
-#include <iostream>
-#include <string_view>
+#include <gtest/gtest.h>
 
-namespace {
+TEST(ParserTests, ParsesRootElementAndAttributes) {
+  const auto result = xml_imgui::parse_xml("<Window title=\"Demo\"></Window>");
 
-int expect(bool condition, std::string_view message) {
-  if (!condition) {
-    std::cerr << "FAIL: " << message << '\n';
-    return 1;
-  }
-  return 0;
+  ASSERT_TRUE(result.ok) << result.error;
+  EXPECT_EQ(result.root.tag, "Window");
+  ASSERT_EQ(result.root.attributes.size(), 1U);
+  EXPECT_EQ(result.root.attributes[0].name, "title");
+  EXPECT_EQ(result.root.attributes[0].value, "Demo");
 }
 
-}  // namespace
-
-int main() {
-  int failures = 0;
-
-  const auto valid = xml_imgui::parse_xml("<Window title=\"Demo\"></Window>");
-  failures += expect(valid.ok, "valid XML should parse");
-  failures += expect(valid.root.tag == "Window", "root tag should be Window");
-  failures += expect(valid.root.attributes.size() == 1, "root should have one attribute");
-  failures += expect(valid.root.attributes[0].name == "title", "attribute name should parse");
-  failures += expect(valid.root.attributes[0].value == "Demo", "attribute value should parse");
-
-  const auto nested =
+TEST(ParserTests, ParsesNestedElementsAndText) {
+  const auto result =
       xml_imgui::parse_xml("<Window><Text value=\"Hello\"/><Button id=\"ok\">OK</Button></Window>");
-  failures += expect(nested.ok, "nested XML should parse");
-  failures += expect(nested.root.children.size() == 2, "root should have two children");
-  failures += expect(nested.root.children[0].tag == "Text", "first child should be Text");
-  failures += expect(nested.root.children[1].tag == "Button", "second child should be Button");
-  failures += expect(nested.root.children[1].text == "OK", "text content should parse");
 
-  const auto empty = xml_imgui::parse_xml("   ");
-  failures += expect(!empty.ok, "empty XML should fail");
+  ASSERT_TRUE(result.ok) << result.error;
+  ASSERT_EQ(result.root.children.size(), 2U);
+  EXPECT_EQ(result.root.children[0].tag, "Text");
+  EXPECT_EQ(result.root.children[1].tag, "Button");
+  EXPECT_EQ(result.root.children[1].text, "OK");
+}
 
-  const auto invalid = xml_imgui::parse_xml("Window");
-  failures += expect(!invalid.ok, "XML without opening bracket should fail");
+TEST(ParserTests, RejectsEmptyInput) {
+  const auto result = xml_imgui::parse_xml("   ");
 
-  return failures;
+  EXPECT_FALSE(result.ok);
+}
+
+TEST(ParserTests, RejectsInputWithoutRootElement) {
+  const auto result = xml_imgui::parse_xml("Window");
+
+  EXPECT_FALSE(result.ok);
 }

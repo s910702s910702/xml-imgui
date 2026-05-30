@@ -1,4 +1,5 @@
 brew "cmake"
 brew "cli11"
+brew "googletest"
 brew "ninja"
 brew "libxml2"

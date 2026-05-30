@@ -1,18 +1,11 @@
 #include "xml_imgui/version.hpp"
 
+#include <gtest/gtest.h>
+
 #include <cctype>
-#include <iostream>
 #include <string_view>
 
 namespace {
-
-int expect(bool condition, std::string_view message) {
-  if (!condition) {
-    std::cerr << "FAIL: " << message << '\n';
-    return 1;
-  }
-  return 0;
-}
 
 bool has_four_numeric_parts(std::string_view version) {
   int part_count = 1;
@@ -41,12 +34,9 @@ bool has_four_numeric_parts(std::string_view version) {
 
 }  // namespace
 
-int main() {
-  int failures = 0;
-
+TEST(VersionTests, UsesMajorMinorPatchCommitFormat) {
   const std::string_view version = xml_imgui::version();
-  failures += expect(!version.empty(), "version should not be empty");
-  failures += expect(has_four_numeric_parts(version), "version should use major.minor.patch.commit format");
 
-  return failures;
+  EXPECT_FALSE(version.empty());
+  EXPECT_TRUE(has_four_numeric_parts(version));
 }
