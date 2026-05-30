@@ -32,6 +32,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Ubuntu dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-dev
+
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: brew bundle
+
       - name: Install Ninja
         uses: seanmiddleditch/gha-setup-ninja@v5
 
