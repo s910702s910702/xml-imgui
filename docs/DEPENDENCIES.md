@@ -7,6 +7,7 @@ This project uses system/package-manager dependencies instead of vendoring third
 | Dependency | Purpose | macOS | Ubuntu CI |
 | --- | --- | --- | --- |
 | CMake | Build system generator | `brew install cmake` | `apt-get install cmake` |
+| CLI11 | CLI argument parser | `brew install cli11` | `apt-get install libcli11-dev` |
 | Ninja | Default CMake preset generator | `brew install ninja` | `apt-get install ninja-build` |
 | libxml2 | XML parser frontend | `brew install libxml2` | `apt-get install libxml2-dev` |
 
@@ -36,11 +37,12 @@ When reproducibility becomes important, consider one of:
 
 ## CMake Integration
 
-The project uses CMake's built-in `FindLibXml2` module:
+The project uses CMake packages for CLI11 and libxml2:
 
 ```cmake
+find_package(CLI11 REQUIRED)
 find_package(LibXml2 REQUIRED)
-target_link_libraries(xml_imgui PUBLIC LibXml2::LibXml2)
+target_link_libraries(xml_imgui PUBLIC CLI11::CLI11 LibXml2::LibXml2)
 ```
 
 On macOS, CMake may find either the system `libxml2` or Homebrew's `libxml2`, depending on local paths. If CMake cannot locate Homebrew's keg-only install, configure with:

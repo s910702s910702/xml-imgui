@@ -15,6 +15,8 @@ int expect(bool condition, std::string_view message) {
 
 }  // namespace
 
+int run_cli_tests();
+
 int main() {
   int failures = 0;
 
@@ -38,6 +40,8 @@ int main() {
 
   const auto invalid = xml_imgui::parse_xml("Window");
   failures += expect(!invalid.ok, "XML without opening bracket should fail");
+
+  failures += run_cli_tests();
 
   return failures;
 }

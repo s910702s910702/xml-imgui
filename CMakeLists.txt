@@ -11,6 +11,7 @@ option(XML_IMGUI_BUILD_TESTS "Build xml_imgui tests" ON)
 option(XML_IMGUI_BUILD_EXAMPLES "Build xml_imgui examples" ON)
 
 find_package(LibXml2 REQUIRED)
+find_package(CLI11 REQUIRED)
 find_package(Git QUIET)
 
 set(XML_IMGUI_VERSION_BASE "${PROJECT_VERSION}")
@@ -51,6 +52,7 @@ configure_file(
 )
 
 add_library(xml_imgui
+  src/cli.cpp
   src/parser.cpp
   src/version.cpp
 )
@@ -66,7 +68,7 @@ target_include_directories(xml_imgui
 
 target_compile_features(xml_imgui PUBLIC cxx_std_20)
 
-target_link_libraries(xml_imgui PUBLIC LibXml2::LibXml2)
+target_link_libraries(xml_imgui PUBLIC CLI11::CLI11 LibXml2::LibXml2)
 
 if(MSVC)
   target_compile_options(xml_imgui PRIVATE /W4 /permissive-)
@@ -81,7 +83,10 @@ endif()
 
 if(XML_IMGUI_BUILD_TESTS)
   enable_testing()
-  add_executable(xml_imgui_tests tests/parser_tests.cpp)
+  add_executable(xml_imgui_tests
+    tests/cli_tests.cpp
+    tests/parser_tests.cpp
+  )
   target_link_libraries(xml_imgui_tests PRIVATE xml_imgui::xml_imgui)
   add_test(NAME xml_imgui_tests COMMAND xml_imgui_tests)
 endif()
